@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1140" viewBox="0 0 390 741" fill="none">
+	<title>Flag of USA — vertical</title>
+	<defs>
+		<pattern patternUnits="userSpaceOnUse" width="42" height="49.4" id="s">
+			<path fill="#fff" d="m9 24.7 21.708 7.053-13.416-18.466v22.826l13.416-18.466z"/>
+		</pattern>
+	</defs>
+	<path fill="#b31942" d="m0 0h390v741H0z"/>
+	<g stroke-width="741" stroke-dasharray="30">
+		<path stroke="#fff" d="m30 370.5h150"/>
+		<path fill="#0a3161" d="m0 0v296.4h225V0z"/>
+		<path stroke="#fff" d="m210 370.5h150"/>
+	</g>
+	<g fill="url(#s)">
+		<path d="m0 0h210v296.4H0z"/>
+		<path transform="translate(21,24.7)" d="m0 0h168v247H0z"/>
+	</g>
+</svg>

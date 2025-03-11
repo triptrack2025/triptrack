@@ -1,0 +1,13 @@
+{
+    "name": "puppeteer-screenshot",
+    "version": "1.0.0",
+    "description": "Screenshot generator with Puppeteer",
+    "main": "screenshot.js",
+    "type": "module",
+    "scripts": {
+        "start": "node screenshot.js"
+    },
+    "dependencies": {
+        "puppeteer": "^24.4.0"
+    }
+}
