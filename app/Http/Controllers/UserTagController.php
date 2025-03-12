@@ -75,6 +75,7 @@ class UserTagController extends Controller
 
     public function updateTagOperation(Request $request)
     {
+
         $request->validate([
             'valuable_type' => ['required'],
             'display_name' => ['required', 'string', 'max:255'],
@@ -87,12 +88,23 @@ class UserTagController extends Controller
     
         // Retrieve the UserTag along with its associated user
         $userTag = UserTag::with('user')->where('tag_id', $request->tag_id)->firstOrFail();
+
+         // Handle Image Upload
+         $imagePath = null;
+         if ($request->hasFile('imageUpload')) {
+             $file = $request->file('imageUpload');
+             $imageName = time() . '_' . $file->getClientOriginalName();
+             $file->move(public_path('assets/images/'), $imageName); 
+             $imagePath = 'assets/images/' . $imageName;
+         } else {
+             $imagePath =  'assets/images/' .$request->input('tag_image_file_name'); // Use provided image filename
+         }
     
         // Update UserTag fields
         $userTag->display_name = $request->display_name;
         $userTag->bag_brand = $request->bag_brand;
         $userTag->valuable_type = $request->valuable_type;
-        $userTag->tag_image = $request->tag_image_file_name;
+        $userTag->tag_image = $imagePath;
         $userTag->save(); // Save UserTag
     
         // Update associated User model

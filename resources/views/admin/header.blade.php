@@ -82,20 +82,20 @@
               <span class="hide-menu">Home</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{{route('admin.dashboard')}}" aria-expanded="false">
+              <a class="sidebar-link {{ Request::is('admin/dashboard') ? 'active' : '' }}"  href="{{route('admin.dashboard')}}" aria-expanded="false" >
                 <i class="ti ti-atom"></i>
                 <span class="hide-menu">Dashboard</span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{{route('admin.genrate-new-qr')}}" aria-expanded="false">
+              <a class="sidebar-link {{ Request::is('admin/genrate-new-qr') ? 'active' : '' }}" href="{{route('admin.genrate-new-qr')}}" aria-expanded="false">
                 <i class="ti ti-atom"></i>
                 <span class="hide-menu">Genrate New QR</span>
               </a>
             </li>
 
-            <li class="sidebar-item">
-              <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+            <li class="sidebar-item  {{ Request::is('admin/product-categories/*') ? 'selected' : '' }} {{ Request::is('admin/products/*') ? 'selected' : '' }}">
+              <a class="sidebar-link has-arrow " href="javascript:void(0)" aria-expanded="false">
                 <span class="d-flex">
                   <i class="ti ti-layout-grid"></i>
                 </span>
@@ -103,7 +103,7 @@
               </a>
               <ul aria-expanded="false" class="collapse first-level">
                 <li class="sidebar-item">
-                  <a href="{{url('admin/product-categories')}}" class="sidebar-link {{ Request::is('admin/product-categories') ? 'active' : '' }}">
+                  <a href="{{url('admin/product-categories')}}" class="sidebar-link {{ Request::is('admin/product-categories/*') ? 'active' : '' }}">
                     <div class="round-16 d-flex align-items-center justify-content-center">
                       <i class="ti ti-circle"></i>
                     </div>
@@ -112,7 +112,7 @@
                 </li>
 
                 <li class="sidebar-item">
-                  <a href="{{url('admin/products')}}" class="sidebar-link {{ Request::is('admin/products') ? 'active' : '' }}">
+                  <a href="{{url('admin/products')}}" class="sidebar-link {{ Request::is('admin/products/*') ? 'active' : '' }}">
                     <div class="round-16 d-flex align-items-center justify-content-center">
                       <i class="ti ti-circle"></i>
                     </div>

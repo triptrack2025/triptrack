@@ -128,7 +128,6 @@ class QRCodeController extends Controller
         return view('auto_post_form', compact('decryptedData'));
     }
 
-
     private function generateGoogleMapUrl($latitude, $longitude)
     {
         if (!$latitude || !$longitude) {
@@ -138,7 +137,6 @@ class QRCodeController extends Controller
         $googleMapsApiKey = env('GOOGLE_MAPS_API_KEY'); // Ensure this is set in .env
         return "https://maps.googleapis.com/maps/api/staticmap?center={$latitude},{$longitude}&zoom=14&size=600x300&maptype=roadmap&markers=color:red%7C{$latitude},{$longitude}&key={$googleMapsApiKey}";
     }
-
   
     public function processFoundItem(Request $request)
     {
@@ -215,7 +213,6 @@ class QRCodeController extends Controller
 
     public function generatePDF(Request $request)
     {
-        // dd($request->all());
         $frontCustomBgImagePath = '';
         // Store image if provided
         if ($request->hasFile('front_custom_bg_image')) {

@@ -1,5 +1,14 @@
 @include('website.header')
 
+<style>
+    .editPetDetails-user-qr {
+        padding-bottom;: 10px;
+    }
+    .editImage {
+        margin-top: 0px !important;
+    }
+</style>
+
 <section id="quote" class="bg-gray padding-small">
     <div class="container text-center">
         <h3 class="display-5 text-center">Create New Account.</h3>
@@ -21,15 +30,24 @@
             <input type="hidden" name="tag_id" value="{{$tag_id}}">
             <input type="hidden" name="tag_image_file_name" id="tag_image_file_name" value="luggage.png">
 
-            <div class="editPetDetails-user-img">
+            <div class="editPetDetails-user-img text-center pb-4">
                 <img id="valuableImage" name="tag_image" alt="valuable image" 
-                    src="{{ url('/assets/images/luggage.png') }}" class="editPetDetails-image">
+                    src="{{ url('/assets/images/luggage.png') }}" class="editPetDetails-image img-fluid">
 
                 <div class="editPetDetails-user-qr mt-1 d-flex align-items-center justify-content-center" style="gap: 6px;">
                     <img alt="qr" src="https://storage.googleapis.com/pettag/qr/assets/qrcode.png" style="width: 30px; height: 30px;">
-                    <p class="mt-3"><b>{{$tag_id}}</b></p>
+                    <p class="mt-0 pb-0 mb-0"><b>{{$tag_id}}</b></p>
+
+                    <!-- Hidden File Input -->
+                    <input type="file" id="imageUpload" name="imageUpload" style="display: none;" accept="image/*" onchange="previewImage(event)">
+
+                    <!-- Edit Icon that Triggers File Input -->
+                    <a class="btn btn-sm btn-primary editImage" onclick="document.getElementById('imageUpload').click();">
+                        <i class="fas fa-edit"></i>
+                    </a>
                 </div>
             </div>
+
 
             <div class="col-lg-12 col-md-12 col-sm-12 mb-4">
                 <select class="w-100 border-0 ps-3 py-2 rounded-2" name="valuable_type" id="valuableTypeSelect" required>
@@ -169,104 +187,107 @@
 @include('website.footer')
 
 <script>
+    
+$(document).ready(function () {
+    $(".contact-form").on("submit", function (e) {
+        e.preventDefault(); // Prevent default form submission
 
-    document.getElementById("valuableTypeSelect").addEventListener("change", function() {
-        const BASE_URL = "{{ url('/assets/images/') }}/";
+        let formData = new FormData(this);
+        let url = $(this).attr("action");
+        let submitBtn = $(".btn-primary");
 
-        const imageMap = {
-            laptop_bag: `laptopbag.png`,
-            briefcase: `briefcase.png`,
-            camera_bag: `camerabag.png`,
-            gym_bag: `GymBag.png`,
-            trolley_bag: `trolley-bag.png`,
-            suitcase: `suitcase.png`,
-            ladies_purse: `ladiespurse.png`,
-            sports_kit_bag: `sport-bag.png`,
-            duffel_bag: `duffelbag.png`,
-            other_bags: `other.png`,
-            school_bag: `schoolbag.png`,
-            luggage: `luggage.png`
-        };
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function () {
+                submitBtn.text("Submitting...").attr("disabled", true);
+            },
+            success: function (response) {
+                submitBtn.text("Submit").attr("disabled", false);
+                $(".contact-form")[0].reset();
 
-        const selectedValue = this.value;
-        const imageElement = document.getElementById("valuableImage");
+                if (response.redirect) {
+                    window.location.href = response.redirect;
+                } else {
+                    Swal.fire({
+                        icon: "success",
+                        title: response.message || "Form submitted successfully!",
+                        showConfirmButton: true
+                    });
+                }
+            },
+            error: function (xhr) {
+                submitBtn.text("Submit").attr("disabled", false);
 
-        if (imageMap[selectedValue]) {
-            imageElement.src = BASE_URL+imageMap[selectedValue];
+                let errorMessages = "Something went wrong. Please try again.";
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    errorMessages = Object.values(xhr.responseJSON.errors).flat().join("<br>");
+                }
 
-            // Adjust image width dynamically
-            if (selectedValue === 'laptop_bag') {
-                imageElement.style.width = "18%";
-            } else {
-                imageElement.style.width = "256px";
-            }
-            $('#tag_image_file_name').val(imageMap[selectedValue]);
-        } else {
-            imageElement.src = "https://storage.googleapis.com/pettag/qr/assets/luggage.png"; // Default image
-        }
-    });
-
-  
-    $(document).ready(function () {
-        $(".contact-form").on("submit", function (e) {
-            e.preventDefault(); // Prevent default form submit
-
-            let formData = new FormData(this); // Get all form data
-            let url = $(this).attr("action"); // Get form action URL
-
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: formData,
-                processData: false,
-                contentType: false,
-                beforeSend: function () {
-                    $(".btn-primary").text("Submitting...").attr("disabled", true); // Button Loading State
-                },
-                success: function (response) {
-                    $(".btn-primary").text("Submit").attr("disabled", false); // Reset Button
-                    $(".contact-form")[0].reset(); // Reset Form
-                    var url = response.redirect;
-                    if(url != ''){
-                        location.href = url;
-                    }else{
-                     
-                        Swal.fire({
-                            icon: 'success',
-                            title: response.message,
-                            showConfirmButton: false,
-                            timer: 4000
-                        });
-                    }
-                  
-                },
-                error: function (xhr) {
-                    $(".btn-primary").text("Submit").attr("disabled", false); // Reset Button
-
-                    let errors = xhr.responseJSON.errors;
-                    if (errors) {
-                        $.each(errors, function (key, value) {
-                                Swal.fire({
-                                icon: 'error',
-                                title: value,
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
-                            
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Invalid Tag Id',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                        // alert("Something went wrong. Please try again.");
-                    }
-                },
-            });
+                Swal.fire({
+                    icon: "error",
+                    title: "Form Submission Failed",
+                    html: errorMessages,
+                    showConfirmButton: true
+                });
+            },
         });
     });
+});
 
+let isCustomImage = false; // Flag to track user-uploaded image
+
+// Handle image preview from file input
+function previewImage(event) {
+    const imageElement = document.getElementById("valuableImage");
+    const file = event.target.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            imageElement.src = e.target.result;
+            imageElement.style.width = "256px";
+            isCustomImage = true; // Prevent override by selection
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Handle valuable type selection change
+document.getElementById("valuableTypeSelect").addEventListener("change", function () {
+    if (isCustomImage) return; // Don't override user-uploaded image
+
+    const BASE_URL = "{{ url('/assets/images/') }}/";
+    const imageMap = {
+        laptop_bag: "laptopbag.png",
+        briefcase: "briefcase.png",
+        camera_bag: "camerabag.png",
+        gym_bag: "GymBag.png",
+        trolley_bag: "trolley-bag.png",
+        suitcase: "suitcase.png",
+        ladies_purse: "ladiespurse.png",
+        sports_kit_bag: "sport-bag.png",
+        duffel_bag: "duffelbag.png",
+        other_bags: "other.png",
+        school_bag: "schoolbag.png",
+        luggage: "luggage.png"
+    };
+
+    const selectedValue = this.value;
+    const imageElement = document.getElementById("valuableImage");
+    const tagImageFileName = document.getElementById("tag_image_file_name");
+
+    if (imageMap[selectedValue]) {
+        imageElement.src = BASE_URL + imageMap[selectedValue];
+        imageElement.style.width = selectedValue === "laptop_bag" ? "18%" : "256px";
+        tagImageFileName.value = imageMap[selectedValue];
+    } else {
+        imageElement.src = "https://storage.googleapis.com/pettag/qr/assets/luggage.png";
+    }
+});
 
 </script>
+

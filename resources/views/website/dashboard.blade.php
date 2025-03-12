@@ -44,9 +44,10 @@
                     <div class="row">
                         <div class="col-md-1 mt-3">
                             <div class="d-flex bagIcon">
-                                <img src="{{ url('/assets/images/'.$userTagValue->tag_image) }}" 
-                                    alt="{{ config('constant.valuable_type.' . $userTagValue->valuable_type) }}" 
-                                    class="me-3" style="width: 100px;">
+                            <img src="{{ $userTagValue->tag_image ? url($userTagValue->tag_image) : url('/assets/images/default.png') }}" 
+                                alt="{{ config('constant.valuable_type.' . ($userTagValue->valuable_type ?? 'default')) }}" 
+                                class="me-3" style="width: 100px;">
+
                             </div>
                             <div class="d-flex">
                                 <img alt="qr" src="https://storage.googleapis.com/pettag/qr/assets/qrcode.png" 

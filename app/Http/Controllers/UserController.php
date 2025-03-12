@@ -111,17 +111,27 @@ class UserController extends Controller
             'mobile' => ['required', 'string', 'max:12'],
             'password' => ['required', Password::defaults()],
             'tag_id' => ['required'],
-            'tag_image_file_name' => ['required']
         ]);
-
+    
         $user = User::where('email', $request->email)->first();
-
+    
+        // Handle Image Upload
+        $imagePath = null;
+        if ($request->hasFile('imageUpload')) {
+            $file = $request->file('imageUpload');
+            $imageName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('assets/images/'), $imageName); 
+            $imagePath = 'assets/images/' . $imageName;
+        } else {
+            $imagePath = $request->input('tag_image_file_name'); // Use provided image filename
+        }
+    
         if (!empty($user)) {
-
-            $isFreshUserTag = UserTag::where('tag_id',$request->tag_id)->where('tag_status','fresh')->first();
-
-            if($isFreshUserTag){
-
+            $isFreshUserTag = UserTag::where('tag_id', $request->tag_id)
+                                      ->where('tag_status', 'fresh')
+                                      ->first();
+    
+            if ($isFreshUserTag) {
                 $userTag = UserTag::updateOrCreate(
                     ['tag_id' => $request->tag_id],
                     [
@@ -129,48 +139,102 @@ class UserController extends Controller
                         'valuable_type' => $request->valuable_type,
                         'display_name' => $request->display_name,
                         'bag_brand' => $request->bag_brand,
-                        'tag_image' => $request->tag_image_file_name,
                         'tag_active_date' => Carbon::now()->toDateString(),
-                        'tag_status' => 'active'
+                        'tag_status' => 'active',
+                        'tag_image' => $imagePath
                     ]
                 );
-
-               
-
+    
                 $user->update([
                     'country_code' => $request->country_code,
                     'mobile' => $request->mobile,
                     'password' => Hash::make($request->password),
                     'user_status' => 'active'
                 ]);
-
+    
                 Auth::logout();
-
+    
                 if (Auth::attempt(['email' => $user->email, 'password' => $request->password])) {
                     return response()->json(['message' => 'Dashboard Redirect', 'redirect' => route('user-dashboard')]);
                 }
-
-            }else{
+            } else {
                 return response()->json(['error' => 'Invalid Tag Id.'], 404);
             }
-           
-        }else {
-
+        } else {
+            // Encrypt only simple data (avoid serializing files)
             $encryptedEmail = encrypt($request->email);
-            $verifyLink = route('user-email.verify', ['email' => $encryptedEmail, 'data' => encrypt($request->all())]);
-        
-            $message = "Please verify your email address by clicking the button below:";
-            $emailContent = "<p>{$message}</p><a href='{$verifyLink}' style='display:inline-block;padding:10px 20px;background-color:#007BFF;color:#fff;text-decoration:none;border-radius:5px;'>Verify Email</a>";
-        
+            $encryptedData = encrypt([
+                'valuable_type' => $request->input('valuable_type'),
+                'display_name' => $request->input('display_name'),
+                'bag_brand' => $request->input('bag_brand'),
+                'country_code' => $request->input('country_code'),
+                'mobile' => $request->input('mobile'),
+                'password' => $request->input('password'),
+                'tag_id' => $request->input('tag_id'),
+                'tag_image_file_name' => $imagePath // Store image path, not file
+            ]);
+    
+            // Send verification email
+            $verifyLink = route('user-email.verify', ['email' => $encryptedEmail, 'data' => $encryptedData]);
+    
+            $message = "Please verify your email by clicking below:";
+            $emailContent = "<p>{$message}</p><a href='{$verifyLink}' style='padding:10px 20px;background:#007BFF;color:#fff;text-decoration:none;border-radius:5px;'>Verify Email</a>";
+    
             Mail::html($emailContent, function ($message) use ($request) {
-                $message->to($request->email)
-                        ->subject('Email Verification');
+                $message->to($request->email)->subject('Email Verification');
             });
-        
-            return response()->json(['message' => 'Verification email sent successfully! Please check your inbox.', 'redirect' => '']);
+    
+            return response()->json(['message' => 'Verification email sent successfully!']);
         }
-
+    
         return response()->json(['error' => 'User not found.'], 404);
+    }
+
+    public function verifyEmail(Request $request)
+    {
+        try {
+            $requestData = decrypt($request->input('data'));
+            $email = decrypt($request->input('email'));
+
+            // Create User
+            $user = User::create([
+                'first_name' => $requestData['display_name'],
+                'email' => $email,
+                'country_code' => $requestData['country_code'],
+                'mobile' => $requestData['mobile'],
+                'password' => Hash::make($requestData['password']),
+                'user_status' => 'active'
+            ]);
+
+            // Prepare UserTag Data
+            $userTagData = [
+                'user_id' => $user->id,
+                'valuable_type' => $requestData['valuable_type'],
+                'display_name' => $requestData['display_name'],
+                'bag_brand' => $requestData['bag_brand'],
+                'tag_active_date' => Carbon::now()->toDateString(),
+                'tag_status' => 'active',
+                'tag_image' => $requestData['tag_image_file_name'] // Use stored image path
+            ];
+
+            // Create or Update UserTag
+            UserTag::updateOrCreate(
+                ['tag_id' => $requestData['tag_id']],
+                $userTagData
+            );
+
+            // Logout and Login User
+            Auth::logout();
+
+            if (Auth::attempt(['email' => $user->email, 'password' => $requestData['password']])) {
+                return redirect('/dashboard')->with('success', 'Email verified successfully!');
+            }
+
+            return redirect('/login')->with('error', 'Login failed. Please try again.');
+
+        } catch (\Exception $e) {
+            return redirect('/')->with('error', 'Invalid or expired verification link.');
+        }
     }
 
     public function dashboard() {

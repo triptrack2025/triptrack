@@ -16,22 +16,30 @@
         @endif
        
 
-        <form class="contact-form row mt-5" method="POST" action="{{ route('update_tag.operation') }}">
+        <form class="contact-form row mt-5" method="POST" action="{{ route('update_tag.operation') }}" enctype="multipart/form-data">
             @csrf
 
             <input type="hidden" name="tag_id" value="{{ $userTag->tag_id }}">
             <input type="hidden" name="tag_image_file_name" id="tag_image_file_name" value="{{ $userTag->tag_image }}">
 
-            <div class="editPetDetails-user-img">
-            <img id="valuableImage" name="tag_image" alt="valuable image" 
-            src="{{ url('/assets/images/'.$userTag->tag_image) }}" 
-            class="editPetDetails-image"
-            style="width: {{ $userTag->tag_type == 'laptop_bag' ? '18%' : '256px' }};">
-
+            <div class="editPetDetails-user-img text-center pb-4">
+                <img id="valuableImage" name="tag_image" 
+                alt="valuable image" 
+                src="{{ $userTag->tag_image ? url($userTag->tag_image) : url('/assets/images/default.png') }}" 
+                class="editPetDetails-image"
+                style="width: {{ $userTag->tag_type == 'laptop_bag' ? '18%' : '256px' }};">
 
                 <div class="editPetDetails-user-qr mt-1 d-flex align-items-center justify-content-center" style="gap: 6px;">
                     <img alt="qr" src="https://storage.googleapis.com/pettag/qr/assets/qrcode.png" style="width: 30px; height: 30px;">
-                    <p class="mt-3"><b>TBFSRFV</b></p>
+                    <p class="mt-0 pb-0 mb-0"><b>{{$userTag->tag_id}}</b></p>
+
+                    <!-- Hidden File Input -->
+                    <input type="file" id="imageUpload" name="imageUpload" style="display: none;" accept="image/*" onchange="previewImage(event)">
+
+                    <!-- Edit Icon that Triggers File Input -->
+                    <a class="btn btn-sm btn-primary editImage" onclick="document.getElementById('imageUpload').click();">
+                        <i class="fas fa-edit"></i>
+                    </a>
                 </div>
             </div>
 
@@ -168,29 +176,52 @@
 @include('website.footer')
 
 <script>
-    document.getElementById("valuableTypeSelect").addEventListener("change", function() {
+    let isCustomImage = false; // Flag to track user-uploaded image
+
+    // Handle image preview from file input
+    function previewImage(event) {
+        const imageElement = document.getElementById("valuableImage");
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                imageElement.src = e.target.result;
+                imageElement.style.width = "256px";
+                isCustomImage = true; // Prevent override by selection
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+   // Handle valuable type selection change
+    document.getElementById("valuableTypeSelect").addEventListener("change", function () {
+        if (isCustomImage) return; // Don't override user-uploaded image
+
         const BASE_URL = "{{ url('/assets/images/') }}/";
         const imageMap = {
-            laptop_bag: `laptopbag.png`,
-            briefcase: `briefcase.png`,
-            camera_bag: `camerabag.png`,
-            gym_bag: `GymBag.png`,
-            trolley_bag: `trolley-bag.png`,
-            suitcase: `suitcase.png`,
-            ladies_purse: `ladiespurse.png`,
-            sports_kit_bag: `sport-bag.png`,
-            duffel_bag: `duffelbag.png`,
-            other_bags: `other.png`,
-            school_bag: `schoolbag.png`,
-            luggage: `luggage.png`
+            laptop_bag: "laptopbag.png",
+            briefcase: "briefcase.png",
+            camera_bag: "camerabag.png",
+            gym_bag: "GymBag.png",
+            trolley_bag: "trolley-bag.png",
+            suitcase: "suitcase.png",
+            ladies_purse: "ladiespurse.png",
+            sports_kit_bag: "sport-bag.png",
+            duffel_bag: "duffelbag.png",
+            other_bags: "other.png",
+            school_bag: "schoolbag.png",
+            luggage: "luggage.png"
         };
 
         const selectedValue = this.value;
         const imageElement = document.getElementById("valuableImage");
+        const tagImageFileName = document.getElementById("tag_image_file_name");
+
         if (imageMap[selectedValue]) {
             imageElement.src = BASE_URL + imageMap[selectedValue];
-            imageElement.style.width = selectedValue === 'laptop_bag' ? "18%" : "256px";
-            document.getElementById("tag_image_file_name").value = imageMap[selectedValue];
+            imageElement.style.width = selectedValue === "laptop_bag" ? "18%" : "256px";
+            tagImageFileName.value = imageMap[selectedValue];
         } else {
             imageElement.src = "https://storage.googleapis.com/pettag/qr/assets/luggage.png";
         }

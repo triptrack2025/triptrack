@@ -40,35 +40,60 @@ Route::get('/signUp/{id?}', [UserController::class, 'signUp'])->name('register.v
 Route::post('/register', [UserController::class, 'registerOperation'])->name('register.operation');
 Route::post('/scan_with_register', [UserController::class, 'scanWithRegisterOperation'])->name('scan_with_register.operation');
 
-Route::get('/user-email/verify', function (Request $request) {
-    $requestData = decrypt($request->input('data'));
-    $email = decrypt($request->input('email'));
+Route::get('/user-email/verify', [UserController::class, 'verifyEmail'])->name('user-email.verify');
 
-    $user = User::create([
-        'first_name' => $requestData['display_name'],
-        'email' => $email,
-        'country_code' => $requestData['country_code'],
-        'mobile' => $requestData['mobile'],
-        'password' => Hash::make($requestData['password']),
-        'user_status' => 'active'
-    ]);
+// Route::get('/user-email/verify', function (Request $request) {
+//     $requestData = decrypt($request->input('data'));
+//     $email = decrypt($request->input('email'));
 
-    UserTag::where('tag_id', $requestData['tag_id'])->update([
-        'user_id' => $user->id,
-        'valuable_type' => $requestData['valuable_type'],
-        'display_name' => $requestData['display_name'],
-        'bag_brand' => $requestData['bag_brand'],
-        'tag_image' => $requestData['tag_image_file_name'],
-        'tag_active_date' => Carbon::now()->toDateString(),
-        'tag_status' => 'active'
-    ]);
+//     $user = User::create([
+//         'first_name' => $requestData['display_name'],
+//         'email' => $email,
+//         'country_code' => $requestData['country_code'],
+//         'mobile' => $requestData['mobile'],
+//         'password' => Hash::make($requestData['password']),
+//         'user_status' => 'active'
+//     ]);
 
-    Auth::logout();
+//     $userTagUpadteItem = [
+//         'user_id' => $user->id,
+//         'valuable_type' => $requestData['valuable_type'],
+//         'display_name' => $requestData['display_name'],
+//         'bag_brand' => $requestData['bag_brand'],
+//         'tag_active_date' => Carbon::now()->toDateString(),
+//         'tag_status' => 'active'
+//     ];
 
-    if (Auth::attempt(['email' => $user->email, 'password' => $requestData['password']])) {
-            return redirect('/dashboard');
-    }
-})->name('user-email.verify');
+//     if ($request->hasFile('imageUpload')) {
+//         $file = $request->file('imageUpload');
+//         $imageName = time() . '_' . $file->getClientOriginalName(); // Unique filename
+//         $file->move(public_path('assets/images/'), $imageName); // Save to public/assets/images/
+//         $userTagUpadteItem['tag_image'] = $imageName;
+//     }else{
+//         $userTagUpadteItem['tag_image'] = $requestData['tag_image_file_name'];
+//     }
+
+//     $userTag = UserTag::updateOrCreate(
+//         ['tag_id' => $requestData['tag_id']],
+//         $userTagUpadteItem
+//     );
+
+//     // UserTag::where('tag_id', $requestData['tag_id'])->update([
+//     //     'user_id' => $user->id,
+//     //     'valuable_type' => $requestData['valuable_type'],
+//     //     'display_name' => $requestData['display_name'],
+//     //     'bag_brand' => $requestData['bag_brand'],
+//     //     'tag_image' => $requestData['tag_image_file_name'],
+//     //     'tag_active_date' => Carbon::now()->toDateString(),
+//     //     'tag_status' => 'active'
+//     // ]);
+
+//     Auth::logout();
+
+//     if (Auth::attempt(['email' => $user->email, 'password' => $requestData['password']])) {
+//             return redirect('/dashboard');
+//     }
+// })->name('user-email.verify');
 
 
 Route::post('/login', [UserController::class, 'loginOperation'])->name('login.operation');

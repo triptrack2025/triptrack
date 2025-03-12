@@ -89,11 +89,29 @@
         }
 
     </style>
-    <script>
-        function printScreen() {
-            window.print();
-        }
-    </script>
+   <script>
+    function printScreen() {
+        const now = new Date();
+        const options = { 
+            weekday: 'short', 
+            day: '2-digit', 
+            month: 'short', 
+            year: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        };
+        const formattedDate = now.toLocaleDateString('en-GB', options)
+            .replace(',', '') // Remove commas
+            .replace(/\s+/g, '_') // Replace spaces with underscores
+            .replace(':', '_'); // Replace colon in time with underscore
+
+        document.title = 'gerated_tag_on_'+formattedDate; // Set the document title
+
+        window.print();
+    }
+</script>
+
+
 </head>
 <body>
     <div class="container">
