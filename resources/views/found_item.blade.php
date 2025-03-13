@@ -84,7 +84,7 @@
 <div class="container d-flex justify-content-center align-items-center">
     <div class="container-box w-100 text-center">
         <h1>Thank You for Finding Me</h1>
-        <img src="{{asset('assets/images/'.$userTag->tag_image)}}" alt="Bag Image" class="my-3" width="100" height="100">
+        <img src="{{asset($userTag->tag_image)}}" alt="Bag Image" class="my-3" width="100" height="100">
         <p><img src="https://storage.googleapis.com/pettag/qr/assets/qrcode.png" alt="qr" class="reportfound-vector me-2"><b>{{$userTag->tag_id}}</b></p>
         <p class="fw-bold">This <span class="text-warning">{{ config('constant.valuable_type.' . $userTag->valuable_type) }}</span> belongs to <br><span class="text-warning">{{$userTag->display_name}}</span></p>
         <div class="contact-btn-container" id="contact-btn">

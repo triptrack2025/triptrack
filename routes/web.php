@@ -42,60 +42,6 @@ Route::post('/scan_with_register', [UserController::class, 'scanWithRegisterOper
 
 Route::get('/user-email/verify', [UserController::class, 'verifyEmail'])->name('user-email.verify');
 
-// Route::get('/user-email/verify', function (Request $request) {
-//     $requestData = decrypt($request->input('data'));
-//     $email = decrypt($request->input('email'));
-
-//     $user = User::create([
-//         'first_name' => $requestData['display_name'],
-//         'email' => $email,
-//         'country_code' => $requestData['country_code'],
-//         'mobile' => $requestData['mobile'],
-//         'password' => Hash::make($requestData['password']),
-//         'user_status' => 'active'
-//     ]);
-
-//     $userTagUpadteItem = [
-//         'user_id' => $user->id,
-//         'valuable_type' => $requestData['valuable_type'],
-//         'display_name' => $requestData['display_name'],
-//         'bag_brand' => $requestData['bag_brand'],
-//         'tag_active_date' => Carbon::now()->toDateString(),
-//         'tag_status' => 'active'
-//     ];
-
-//     if ($request->hasFile('imageUpload')) {
-//         $file = $request->file('imageUpload');
-//         $imageName = time() . '_' . $file->getClientOriginalName(); // Unique filename
-//         $file->move(public_path('assets/images/'), $imageName); // Save to public/assets/images/
-//         $userTagUpadteItem['tag_image'] = $imageName;
-//     }else{
-//         $userTagUpadteItem['tag_image'] = $requestData['tag_image_file_name'];
-//     }
-
-//     $userTag = UserTag::updateOrCreate(
-//         ['tag_id' => $requestData['tag_id']],
-//         $userTagUpadteItem
-//     );
-
-//     // UserTag::where('tag_id', $requestData['tag_id'])->update([
-//     //     'user_id' => $user->id,
-//     //     'valuable_type' => $requestData['valuable_type'],
-//     //     'display_name' => $requestData['display_name'],
-//     //     'bag_brand' => $requestData['bag_brand'],
-//     //     'tag_image' => $requestData['tag_image_file_name'],
-//     //     'tag_active_date' => Carbon::now()->toDateString(),
-//     //     'tag_status' => 'active'
-//     // ]);
-
-//     Auth::logout();
-
-//     if (Auth::attempt(['email' => $user->email, 'password' => $requestData['password']])) {
-//             return redirect('/dashboard');
-//     }
-// })->name('user-email.verify');
-
-
 Route::post('/login', [UserController::class, 'loginOperation'])->name('login.operation');
 Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
@@ -123,9 +69,8 @@ Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showRes
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 
 
-
 // cms pages
-Route::get('/collection/page/{type}', [CMSPageController::class, 'collectionView'])->name('collection.page');
+Route::get('/collection/page/{type}', [CMSPageController::class, 'collectionView'])->name('collection');
 Route::post('/contact-us/opration', [CMSPageController::class, 'contactUsOpration'])->name('contact-us.operation');
 Route::post('/grow-with-triptrack-register.operation', [GrowWithTripTrackController::class, 'register'])->name('/grow-with-triptrack-register.operation');
 
@@ -177,12 +122,12 @@ Route::get('/location-map', function () {
                                                              * Admin Panel Routes
                                                              */
 
+Route::get('/admin/login', [DashboardController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/login', [DashboardController::class, 'loginOperation'])->name('admin.login.operation');
 
-                                                             
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware('admin')->group(function () {
 
-    Route::get('/login', [DashboardController::class, 'showLoginForm'])->name('admin.login');
-    Route::post('/login', [DashboardController::class, 'loginOperation'])->name('admin.login.operation');
+  
     Route::get('logout', [DashboardController::class, 'logout'])->name('admin.logout');
 
     Route::get('/genrate-new-qr', [DashboardController::class, 'genrateNewQr'])->name('admin.genrate-new-qr');

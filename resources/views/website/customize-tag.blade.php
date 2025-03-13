@@ -187,7 +187,7 @@
                                 <!-- <h1 id="previewMiddleContent" style="color: #383434; font-size: 200%;margin-top:30px;margin-bottom:20px;text-align:left;">FOUND ME?<br>SCAN QR<br>TO RETURN</h1> -->
 
                                 <p id="previewQrCodepTag" style="margin-bottom:1px;"><img src="/assets/images/triptrack-sample-qr.png" id="previewQrCodeimg" class="previewQrCodeimg"  width="90" height="90"></p>
-                                <b style="margin-bottom:25px;letter-spacing:2px;color:black;font-size:13px;">ADSFVFD</b>
+                                <b style="margin-bottom:25px;letter-spacing:2px;color:black;font-size:13px;">SELIYO2</b>
                                 <!-- <p id="previewFooter">Powered by TripTrack</p> -->
                                 <p id="previewFooter"></p>
 

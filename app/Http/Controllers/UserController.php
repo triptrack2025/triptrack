@@ -14,14 +14,41 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\UserTag;
+use App\Models\Product;
+
+
 use Carbon\Carbon;
 
 class UserController extends Controller
 {
+
+    private $bestSellers;
+    private $populerProducts;
+
+    public function __construct()
+    {
+        // Fetch only 4 Best Seller Products
+        $this->bestSellers = Product::with('images')
+            ->where('is_best_seller', 1)
+            ->orderBy('id', 'desc')
+            ->limit(4)
+            ->get();
+
+        // Fetch only 8 Popular Products
+        $this->populerProducts = Product::with('images')
+            ->where('is_popular_product', 1)
+            ->orderBy('id', 'desc')
+            ->limit(8)
+            ->get();
+    }
+
     public function login(): View
     {
         if (Auth::check()) {
-            return view('website.index');
+            return view('website.index', [
+                'bestSellers' => $this->bestSellers,
+                'populerProducts' => $this->populerProducts
+            ]);
         }
         return view('auth.login');
     }
@@ -54,7 +81,10 @@ class UserController extends Controller
        if($tag_id ==  0){
 
             if (Auth::check()) {
-                return view('website.index');
+                return view('website.index', [
+                    'bestSellers' => $this->bestSellers,
+                    'populerProducts' => $this->populerProducts
+                ]);
             }
             return view('auth.register');
 
@@ -123,7 +153,7 @@ class UserController extends Controller
             $file->move(public_path('assets/images/'), $imageName); 
             $imagePath = 'assets/images/' . $imageName;
         } else {
-            $imagePath = $request->input('tag_image_file_name'); // Use provided image filename
+            $imagePath = 'assets/images/' . $request->input('tag_image_file_name'); // Use provided image filename
         }
     
         if (!empty($user)) {

@@ -25,41 +25,41 @@
                     <!-- Main Slider -->
                     <div class="main-slider pattern-overlay">
                         <div class="slider-item">
-                            <img src="assets/images/Home_page_1.jpg" alt="banner" class="banner-image">
-                            <div class="banner-content">
+						<img src="{{ asset('assets/images/Home_page_1.jpg') }}" alt="banner" class="banner-image">
+						<div class="banner-content">
                                 <h3 class="banner-title banner-title-color">Pack Your Bags, Forget Your Worries</h3>
                                 <div class="btn-wrap">
-                                    <a href="customize-tag" class="btn btn-outline-accent btn-accent-arrow">Shop Now <i class="icon icon-ns-arrow-right"></i></a>
+                                    <a href="{{ url('/collection/all') }}" class="btn btn-outline-accent btn-accent-arrow">Shop Now <i class="icon icon-ns-arrow-right"></i></a>
                                 </div>
                             </div>
                         </div><!--slider-item-->
 
 						<div class="slider-item">
-                            <img src="assets/images/Home_page_9.jpg" alt="banner" class="banner-image">
-                            <div class="banner-content">
+						<img src="{{ asset('assets/images/Home_page_9.jpg') }}" alt="banner" class="banner-image">
+						<div class="banner-content">
                                 <h3 class="banner-title">Gifts as Unique as Them, Customized Delights for Every Occasion</h3>
                                 <div class="btn-wrap">
-                                    <a href="customize-tag" class="btn btn-outline-accent btn-accent-arrow">Shop Now <i class="icon icon-ns-arrow-right"></i></a>
+                                    <a href="{{ url('/collection/all') }}" class="btn btn-outline-accent btn-accent-arrow">Shop Now <i class="icon icon-ns-arrow-right"></i></a>
                                 </div>
                             </div>
                         </div><!--slider-item-->
 
                         <div class="slider-item">
-                            <img src="assets/images/Home_page_5.jpg" alt="banner" class="banner-image">
-                            <div class="banner-content">
+						<img src="{{ asset('assets/images/Home_page_5.jpg') }}" alt="banner" class="banner-image">
+						<div class="banner-content">
                                 <h3 class="banner-title banner-title-color">Effortlessly Track Your Daily Necessities</h3>
                                 <div class="btn-wrap">
-                                    <a href="customize-tag" class="btn btn-outline-accent btn-accent-arrow">Shop Now <i class="icon icon-ns-arrow-right"></i></a>
+                                    <a href="{{ url('/collection/all') }}" class="btn btn-outline-accent btn-accent-arrow">Shop Now <i class="icon icon-ns-arrow-right"></i></a>
                                 </div>
                             </div>
                         </div><!--slider-item-->
 
 						<div class="slider-item">
-                            <img src="assets/images/Home_page_8.webp" alt="banner" class="banner-image">
-                            <div class="banner-content">
+						<img src="{{ asset('assets/images/Home_page_8.webp') }}" alt="banner" class="banner-image">
+						<div class="banner-content">
                                 <h3 class="banner-title banner-title-color">Never Let Go of What Matters Most</h3>
                                 <div class="btn-wrap">
-                                    <a href="customize-tag" class="btn btn-outline-accent btn-accent-arrow">Shop Now <i class="icon icon-ns-arrow-right"></i></a>
+                                    <a href="{{ url('/collection/all') }}" class="btn btn-outline-accent btn-accent-arrow">Shop Now <i class="icon icon-ns-arrow-right"></i></a>
                                 </div>
                             </div>
                         </div><!--slider-item-->
@@ -148,7 +148,7 @@
 									@php
 										$firstImage = $populer_product->images->first() ? asset($populer_product->images->first()->image) : asset('uploads/products/default.png');
 									@endphp
-									<img src="{{ $firstImage }}" alt="{{ $product->name }}" class="product-item">
+									<img src="{{ $firstImage }}" alt="{{ $populer_product->name }}" class="product-item">
 									<button type="button" class="add-to-cart" data-product-tile="add-to-cart">
 										Add to Cart
 									</button>
@@ -159,8 +159,8 @@
 									</a>
 									<span>{{ $populer_product->category->name ?? 'Uncategorized' }}</span>
 									<div class="item-price">	
-										Rs. {{ $product->price }}
-										<span class="text-decoration-line-through fw-bold">Rs.  {{ $product->cancelled_price }}</span>
+										Rs. {{ $populer_product->price }}
+										<span class="text-decoration-line-through fw-bold">Rs.  {{ $populer_product->cancelled_price }}</span>
 
 									</div>
 								</figcaption>

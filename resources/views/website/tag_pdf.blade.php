@@ -151,7 +151,7 @@
                         </div>
                         <p class="previewQrCodepTag"><img src="{{ public_path('assets/images/triptrack-sample-qr.png') }}" id="previewQrCodeimg" class="previewQrCodeimg"  width="90" height="90"></p>                
 
-                        <b style="margin-bottom:25px;letter-spacing:2px;color:black;font-size:13px;">ADSFVFD</b>
+                        <b style="margin-bottom:25px;letter-spacing:2px;color:black;font-size:13px;">SELIYO2</b>
                     </div>
                 </div>
             </div>

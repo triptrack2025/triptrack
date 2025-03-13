@@ -80,9 +80,7 @@
     <table class="table">
         <tr>
             <td width="40%">
-                <img src="{{ url('assets/images/' . ($userTag['tag_image'] ?? 'default_image.png')) }}" 
-                     alt="Bag Security Tag Image" 
-                     class="image">
+            <img src="{{ url($userTag['tag_image'] ?? 'default_image.png') }}" alt="Bag Security Tag Image" class="image">
                 <p>{{ $userTag['tag_id'] ?? 'N/A' }}</p>
             </td>
            
