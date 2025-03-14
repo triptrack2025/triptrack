@@ -42,10 +42,10 @@ class UserController extends Controller
             ->get();
     }
 
-    public function login(): View
+    public function login()
     {
         if (Auth::check()) {
-            return view('website.index', [
+            return redirect('/')->with([
                 'bestSellers' => $this->bestSellers,
                 'populerProducts' => $this->populerProducts
             ]);
@@ -81,7 +81,7 @@ class UserController extends Controller
        if($tag_id ==  0){
 
             if (Auth::check()) {
-                return view('website.index', [
+                return redirect('/')->with([
                     'bestSellers' => $this->bestSellers,
                     'populerProducts' => $this->populerProducts
                 ]);
@@ -205,13 +205,20 @@ class UserController extends Controller
             ]);
     
             // Send verification email
-            $verifyLink = route('user-email.verify', ['email' => $encryptedEmail, 'data' => $encryptedData]);
-    
-            $message = "Please verify your email by clicking below:";
-            $emailContent = "<p>{$message}</p><a href='{$verifyLink}' style='padding:10px 20px;background:#007BFF;color:#fff;text-decoration:none;border-radius:5px;'>Verify Email</a>";
-    
-            Mail::html($emailContent, function ($message) use ($request) {
-                $message->to($request->email)->subject('Email Verification');
+            $verifyLink = route('user-email.verify', [
+                'email' => $encryptedEmail, 
+                'data' => $encryptedData
+            ]);
+            
+            $message = "Hello {$request->input('display_name')},<br><br>";
+            $message .= "Please verify your email by clicking below:<br><br>";
+            $message .= "<a href='{$verifyLink}' style='padding:10px 20px;background:#007BFF;color:#fff;text-decoration:none;border-radius:5px;'>Verify Email</a><br><br>";
+            $message .= "<br><br>Best Regards,<br>TripTrack Support Team";
+            
+            Mail::send([], [], function ($mail) use ($request, $message) {
+                $mail->to($request->email)
+                     ->subject('Email Verification')
+                     ->html($message);
             });
     
             return response()->json(['message' => 'Verification email sent successfully!']);

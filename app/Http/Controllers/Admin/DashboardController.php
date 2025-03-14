@@ -41,7 +41,7 @@ class DashboardController extends Controller
             do {
                 $tag_id = strtoupper(Str::random(7, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'));
             } while (UserTag::where('tag_id', $tag_id)->exists());
-            $tag_id = 'SELIYO2';
+            // $tag_id = 'SELIYO2';
             // Create the QR Code URL
             $link = url('scan/' . $tag_id);
             

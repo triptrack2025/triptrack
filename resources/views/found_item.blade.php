@@ -141,27 +141,73 @@
             }
         });
 
-        let userTag = {!! json_encode($userTag) !!};
-        function sendData() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    $.post("/send-location-email", {
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                        userTag: userTag,
-                        _token: "{{ csrf_token() }}"
-                    }, function (response) {
-                        console.log("Email sent successfully!", response);
-                    }).fail(function (error) {
-                        console.error("Error sending email:", error);
-                    });
-                });
-            } else {
-                console.error("Geolocation not supported.");
-            }
-        }
-        sendData();
+       
     });
+
+    let userTag = {!! json_encode($userTag) !!};
+
+function requestLocation() {
+    // Check permission status before requesting location
+    navigator.permissions.query({ name: "geolocation" }).then(function (result) {
+        if (result.state === "granted") {
+            // If permission is granted, get location directly
+            getUserLocation();
+        } else if (result.state === "prompt") {
+            // If not decided, trigger browser prompt
+            getUserLocation();
+        } else if (result.state === "denied") {
+            // If denied, suggest enabling location manually
+            showLocationPrompt();
+        }
+    });
+}
+
+function getUserLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                $.post("/send-location-email", {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    userTag: userTag,
+                    _token: "{{ csrf_token() }}"
+                }, function (response) {
+                    console.log("✅ Email sent successfully!", response);
+                    
+                }).fail(function (error) {
+                    console.error("❌ Error sending email:", error);
+                });
+            },
+            function (error) {
+                console.error("❌ Geolocation error:", error.message);
+
+                if (error.code === error.PERMISSION_DENIED) {
+                    showLocationPrompt();
+                } else {
+                    alert("⚠ Error retrieving location. Please try again.");
+                }
+            }
+        );
+    } else {
+        alert("❌ Your browser does not support geolocation.");
+    }
+}
+
+function showLocationPrompt() {
+    // This informs the user but doesn't spam alerts
+    let confirmEnable = confirm("⚠ Location access is required!\n\nPlease enable it in your phone settings.");
+    if (confirmEnable) {
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500); // Reload after 1.5 seconds if user confirms
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    requestLocation();
+});
+
 </script>
+
 </body>
 </html>
